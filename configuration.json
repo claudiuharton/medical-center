@@ -1,0 +1,22 @@
+{
+  "dev": {
+    "db": {
+      "username": "root",
+      "password": "",
+      "database": "medical-center",
+      "dialect": "mysql"
+    },
+    "port": 8081,
+    "sessionKey": "eg[isfd-8yF9-7w2315dzx22qwqi;;termgerdfkhmdkrherhhehwemgro8"
+  },
+  "prod": {
+    "db": {
+      "database": "dc9koo253ci052",
+      "username": "enihqhjiilhufm",
+      "password": "254f7b0130c525ff0968f1deef680db4a20e6a2817ffda5b4358bf523c1df4a8",
+      "dialect": "postgres",
+      "host": "ec2-54-220-35-19.eu-west-1.compute.amazonaws.com"
+    },
+    "sessionKey": "eg[isfd-8yF9-7w2315zasdadqweqweqweqwi;ewmgerdfkhmdkrherhhehwemgro8"
+  }
+}

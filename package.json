@@ -1,0 +1,28 @@
+{
+  "name": "project-start",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "author": "",
+  "license": "ISC",
+  "scripts": {
+    "start": "node server/server.js"
+  },
+  "heroku-postbuild": "npm install",
+  "engines": {
+    "node": "10.x",
+    "npm": "6.x"
+  },
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "client-sessions": "^0.8.0",
+    "connect-history-api-fallback": "^1.6.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "mysql2": "^2.0.1",
+    "pg": "^8.2.1",
+    "pg-hstore": "^2.3.3",
+    "sequelize": "^5.21.2",
+    "serve-static": "^1.14.1"
+  }
+}

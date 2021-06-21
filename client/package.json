@@ -1,0 +1,35 @@
+{
+  "name": "medical-clinic",
+  "version": "0.0.1",
+  "description": "A Quasar Framework app",
+  "productName": "Medical Center",
+  "cordovaId": "org.cordova.quasar.app",
+  "private": true,
+  "scripts": {
+    "lint": "eslint --ext .js,.vue src",
+    "test": "echo \"No test specified\" && exit 0"
+  },
+  "dependencies": {
+    "@quasar/extras": "^1.10.6",
+    "axios": "^0.21.1",
+    "quasar": "^1.15.20",
+    "vue-i18n": "^8.0.0"
+  },
+  "devDependencies": {
+    "@quasar/app": "^1.9.6",
+    "@quasar/quasar-app-extension-qcalendar": "^3.4.0",
+    "@vue/eslint-config-prettier": "^4.0.0",
+    "babel-eslint": "^10.0.1",
+    "eslint": "^5.10.0",
+    "eslint-loader": "^2.1.1",
+    "eslint-plugin-vue": "^5.0.0"
+  },
+  "engines": {
+    "node": ">= 8.9.0",
+    "npm": ">= 5.6.0",
+    "yarn": ">= 1.6.0"
+  },
+  "browserslist": [
+    "last 1 version, not dead, ie >= 11"
+  ]
+}
