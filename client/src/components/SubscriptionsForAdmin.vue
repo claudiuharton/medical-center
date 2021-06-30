@@ -1,14 +1,10 @@
 <template>
   <div>
     <q-table
-      title="Available services"
-      :data="services"
+      title="Available subscriptions"
+      :data="subscriptions"
       :filter="filter"
-      :columns="
-        isAdmin
-          ? columns.filter(item => item.name != 'offer')
-          : columns.filter(item => item.name != 'actions')
-      "
+      :columns="columns"
       row-key="name"
       style="margin:50px"
     >
@@ -32,7 +28,7 @@
             class="button"
             outline
             style="margin-right:20px"
-            @click="editService(props.row)"
+            @click="editSubscription(props.row)"
             round
             color="primary"
             icon="create"
@@ -40,7 +36,7 @@
           <q-btn
             class="button"
             outline
-            @click="removeService(props.row)"
+            @click="removeSubscription(props.row)"
             round
             color="negative"
             icon="delete"
@@ -48,21 +44,8 @@
         </q-td>
       </template>
 
-      <template v-slot:body-cell-offer="props">
-        <q-td :props="props">
-          <div class="text-pre-wrap">
-            <q-toggle
-              checked-icon="check"
-              unchecked-icon="clear"
-              v-model="props.row.offer"
-              @input="updateOffer(props.row.id)"
-            />
-          </div>
-        </q-td>
-      </template>
-
-      <template v-slot:top-left v-if="isAdmin">
-        <q-btn color="primary" label="ADD" outline @click="addService" />
+      <template v-slot:top-left>
+        <q-btn color="primary" label="ADD" outline @click="addSubscription" />
 
         <q-space />
       </template>
@@ -72,9 +55,9 @@
       <q-card class="my-card full-width">
         <q-card-section class="row text-h5 ellipsis">
           <div class="col-3 text-grey" v-if="state === 'ADD'">
-            Add service
+            Add subscription
           </div>
-          <div class="col-3 text-grey" v-else>Edit service</div>
+          <div class="col-3 text-grey" v-else>Edit subscription</div>
         </q-card-section>
         <q-card-section>
           <div class="row q-mb-md">
@@ -83,33 +66,33 @@
               class="col-9"
               type="text"
               outlined
-              v-model="selectedService.name"
+              v-model="selectedSubscription.type"
               dense
-              label="Name"
+              label="Type"
             />
           </div>
 
           <div class="row q-mb-md">
-            <div class="col-3 text-grey">Description:</div>
+            <div class="col-3 text-grey">Price percent:</div>
             <q-input
               class="col-9"
-              type="text"
+              type="number"
               outlined
-              v-model="selectedService.description"
+              v-model="selectedSubscription.pricePercent"
               dense
-              label="Description"
+              label="Price percent"
             />
           </div>
           <div class="row q-mb-md">
-            <div class="col-3 text-grey">Category:</div>
+            <div class="col-3 text-grey">Count:</div>
 
             <q-input
               class="col-9"
-              type="text"
+              type="number"
               outlined
-              v-model="selectedService.category"
+              v-model="selectedSubscription.count"
               dense
-              label="Category"
+              label="Count"
             />
           </div>
         </q-card-section>
@@ -119,7 +102,7 @@
               icon="add"
               outline
               color="primary"
-              @click="executeAddService"
+              @click="executeAddSubscription"
               v-if="state === 'ADD'"
               >Add</q-btn
             >
@@ -128,7 +111,7 @@
               outline
               color="primary"
               v-else
-              @click="executeSaveService"
+              @click="executeSaveSubscription"
               >Edit</q-btn
             >
           </q-card-actions>
@@ -139,22 +122,22 @@
 </template>
 <script>
 export default {
-  name: "Service",
+  name: "Subscription",
   data() {
     return {
       state: "VIEW",
-      tab: "services",
+      tab: "subscriptions",
       filter: "",
       card: false,
-      editMedicService: "",
-      selectedService: {},
+      editMedicSubscription: "",
+      selectedSubscription: {},
       categoryOptions: [
         "consultație fizica",
         "consultație online",
         "recoltare analize",
         "interpretare analize"
       ],
-      servicesOptions: [
+      subscriptionsOptions: [
         "Cardiologie",
         "Dermatologie",
         "Endocrinologie",
@@ -173,39 +156,30 @@ export default {
       ],
       columns: [
         {
-          name: "name",
+          name: "type",
           required: true,
-          label: "Name",
+          label: "Type",
           align: "left",
-          field: row => row.name,
+          field: row => row.type,
           format: val => `${val}`,
           sortable: true
         },
         {
-          name: "description",
+          name: "pricePercent",
           required: true,
-          label: "Description",
+          label: "Price percent (%)",
           align: "left",
-          field: row => row.description,
-          format: val => `${val}`,
+          field: row => row.pricePercent,
+          format: val => `${val}%`,
           sortable: true
         },
         {
-          name: "category",
+          name: "count",
           required: true,
-          label: "Category",
+          label: "Count",
           align: "left",
-          field: row => row.category,
+          field: row => row.count,
           format: val => `${val}`,
-          sortable: true
-        },
-        {
-          name: "offer",
-          required: true,
-          label: "Offering this service?",
-          align: "left",
-          field: row => this.medicServices.find(item => item.id == row.id),
-          format: val => `${val ? "YES" : "NO"}`,
           sortable: true
         },
         {
@@ -220,38 +194,37 @@ export default {
     if (!user) {
       this.$router.push("/auth");
     } else {
-      this.$store.dispatch("data/loadServices");
-      this.$store.dispatch("data/loadMedicServices");
+      this.$store.dispatch("data/loadSubscriptions");
     }
   },
   methods: {
-    addService() {
+    addSubscription() {
       this.state = "ADD";
       this.card = true;
-      this.selectedService = {
-        name: "",
-        description: "",
-        category: ""
+      this.selectedSubscription = {
+        type: "",
+        pricePercent: "",
+        count: ""
       };
     },
-    editService(service) {
+    editSubscription(subscription) {
       this.state = "EDIT";
       this.card = true;
-      this.selectedService = {
-        ...service
+      this.selectedSubscription = {
+        ...subscription
       };
     },
-    removeService(service) {
+    removeSubscription(subscription) {
       this.$q
         .dialog({
           title: "Confirmation",
-          message: `Do you want to delete ${service.name}?`,
+          message: `Do you want to delete ${subscription.name}?`,
           cancel: true,
           persistent: true
         })
         .onOk(() => {
           this.$axios
-            .delete(`/api/services/${service.id}`)
+            .delete(`/api/subscriptions/${subscription.id}`)
             .then(response => {
               this.$q.notify({
                 color: "primary",
@@ -259,7 +232,7 @@ export default {
                 message: response.data.message,
                 icon: "arrow_forward"
               });
-              this.$store.dispatch("data/loadServices");
+              this.$store.dispatch("data/loadSubscriptions");
               this.$store.dispatch("data/loadAllExperiences");
             })
             .catch(error => {
@@ -283,10 +256,10 @@ export default {
             });
         });
     },
-    executeSaveService() {
+    executeSaveSubscription() {
       this.$axios
-        .put(`/api/services/${this.selectedService.id}`, {
-          ...this.selectedService
+        .put(`/api/subscriptions/${this.selectedSubscription.id}`, {
+          ...this.selectedSubscription
         })
         .then(response => {
           this.$q.notify({
@@ -295,8 +268,8 @@ export default {
             message: response.data.message,
             icon: "arrow_forward"
           });
-          this.$store.dispatch("data/loadServices");
-          this.$store.dispatch("data/loadMedicServices");
+          this.$store.dispatch("data/loadSubscriptions");
+          this.$store.dispatch("data/loadMedicSubscriptions");
           this.card = false;
         })
         .catch(error => {
@@ -320,10 +293,10 @@ export default {
         });
     },
 
-    executeAddService() {
+    executeAddSubscription() {
       this.$axios
-        .post("/api/services", {
-          ...this.selectedService
+        .post("/api/subscriptions", {
+          ...this.selectedSubscription
         })
         .then(response => {
           this.$q.notify({
@@ -332,8 +305,7 @@ export default {
             message: response.data.message,
             icon: "arrow_forward"
           });
-          this.$store.dispatch("data/loadServices");
-          this.$store.dispatch("data/loadMedicServices");
+          this.$store.dispatch("data/loadSubscriptions");
           this.card = false;
         })
         .catch(error => {
@@ -355,70 +327,11 @@ export default {
             }
           }
         });
-    },
-    updateOffer(id) {
-      this.$axios
-        .put("/api/services/medic", {
-          serviceId: id
-        })
-        .then(response => {
-          this.$store.dispatch("data/loadMedicServices");
-          this.$q.notify({
-            color: "primary",
-
-            message: response.data.message,
-            icon: "arrow_forward"
-          });
-        })
-        .catch(error => {
-          switch (error.response.status) {
-            case 400: {
-              error.response.data.errors.forEach(element => {
-                this.$q.notify({
-                  color: "negative",
-                  message: element
-                });
-              });
-              break;
-            }
-            default: {
-              this.$q.notify({
-                color: "negative",
-                message: error.response.data.message
-              });
-            }
-          }
-        });
-    },
-
-    hasOffer(id) {
-      return !!this.medicServices.find(item => item.id == id);
     }
   },
   computed: {
-    isMedic() {
-      return this.$q.localStorage.getItem("user")
-        ? this.$q.localStorage.getItem("user").type == "medic"
-        : false;
-    },
-    isAdmin() {
-      return this.$q.localStorage.getItem("user")
-        ? this.$q.localStorage.getItem("user").type == "admin"
-        : false;
-    },
-    services() {
-      return this.$store.getters["data/getServices"].map(item => {
-        return { ...item, offer: this.hasOffer(item.id) };
-      });
-    },
-    medicServices() {
-      const user = this.$q.localStorage.getItem("user");
-
-      const list = this.$store.getters["data/getMedicServices"].find(
-        item => item.id == user.id
-      );
-
-      return list ? list.services : [];
+    subscriptions() {
+      return this.$store.getters["data/getSubscriptions"];
     }
   }
 };

@@ -1,7 +1,12 @@
-const { Appointment, User, Service, MedicService } = require("../models");
-const Sequelize = require("sequelize");
+const {
+  Appointment,
+  User,
+  Service,
+  MedicService,
+  UserSubscription,
+} = require("../models");
 
-const Op = Sequelize.Op;
+const { Op } = require("sequelize");
 
 function formatDate(date) {
   var d = new Date(date),
@@ -71,15 +76,37 @@ const controller = {
           message: `Appointment not found`,
         });
       } else {
+        const medicService = await MedicService.findOne({
+          where: { id: appointment.medicServiceId },
+          raw: true,
+        });
+
+        const userSubscription = await UserSubscription.findOne({
+          where: { userId, serviceId: medicService.serviceId },
+        });
+
         if (appointment.userId && appointment.userId != userId) {
           res.status(400).send({
             message: `Appointment already reserved`,
           });
         } else if (!appointment.userId) {
-          await appointment.update({ ...appointment, userId });
-          res.status(200).send({
-            message: `Appointment reserverd`,
-          });
+          if (userSubscription && userSubscription.count > 0) {
+            await appointment.update({ ...appointment, userId });
+
+            await userSubscription.update({
+              ...userSubscription,
+              // active: userSubscription.count - 1 > 0,
+              count: userSubscription.count - 1,
+            });
+
+            res.status(200).send({
+              message: `Appointment reserverd`,
+            });
+          } else {
+            res.status(400).send({
+              message: `Appointment can't be reserved`,
+            });
+          }
         } else {
           const now = new Date();
           const appointmentDate = new Date(appointment.date);
@@ -89,10 +116,21 @@ const controller = {
               message: `Appointment can't be canceled (max 24h before)`,
             });
           } else {
-            await appointment.update({ ...appointment, userId: null });
-            res.status(200).send({
-              message: `Appointment canceled`,
-            });
+            if (userSubscription && userSubscription.active) {
+              await appointment.update({ ...appointment, userId: null });
+              await userSubscription.update({
+                ...userSubscription,
+                // active: userSubscription.count + 1 > 0,
+                count: userSubscription.count + 1,
+              });
+              res.status(200).send({
+                message: `Appointment canceled`,
+              });
+            } else {
+              res.status(400).send({
+                message: `Appointment can't be canceled`,
+              });
+            }
           }
         }
       }
@@ -107,46 +145,99 @@ const controller = {
     try {
       const rawAppointments = await Appointment.findAll({ raw: true });
 
+      const user = await User.findOne({
+        where: { id: req.session.id },
+        raw: true,
+      });
+
       const appointments = await Promise.all(
-        rawAppointments.map(async (appointment) => {
-          const medicService = await MedicService.findOne({
-            where: { id: appointment.medicServiceId },
-            raw: true,
-          });
-          const medic = await User.findOne({
-            attributes: [
-              "id",
-              "firstName",
-              "lastName",
-              "info",
-              "email",
-              "phone",
-              "city",
-            ],
-            where: { id: medicService.userId },
-            raw: true,
-          });
+        rawAppointments
+          .map(async (appointment) => {
+            const medicService = await MedicService.findOne({
+              where: { id: appointment.medicServiceId },
+              raw: true,
+            });
+            const medic = await User.findOne({
+              attributes: [
+                "id",
+                "firstName",
+                "lastName",
+                "info",
+                "email",
+                "phone",
+                "city",
+              ],
+              where: { id: medicService.userId },
+              raw: true,
+            });
 
-          const service = await Service.findOne({
-            where: { id: medicService.serviceId },
-            raw: true,
-          });
+            const service = await Service.findOne({
+              where: { id: medicService.serviceId },
+              raw: true,
+            });
 
-          return {
-            id: appointment.id,
-            duration: appointment.duration,
-            date: formatDate(appointment.date),
-            time: appointment.date.toLocaleTimeString([], {
-              hour12: false,
-              hour: "2-digit",
-              minute: "2-digit",
-            }),
-            // url: appointment.url,
-            medic,
-            service,
-            status: appointment.userId ? "RESERVED" : "OPEN",
-          };
-        })
+            if (user.type == "medic") {
+              return {
+                id: appointment.id,
+                duration: appointment.duration,
+                date: formatDate(appointment.date),
+                time: appointment.date.toLocaleTimeString([], {
+                  hour12: false,
+                  hour: "2-digit",
+                  minute: "2-digit",
+                }),
+                // url: appointment.url,
+                medic,
+                service,
+                status: appointment.userId ? "RESERVED" : "OPEN",
+              };
+            } else {
+              const userSubscription = await UserSubscription.findOne({
+                where: {
+                  userId: req.session.id,
+                  serviceId: medicService.serviceId,
+                  count: { [Op.gt]: 0 },
+                },
+              });
+
+              if (appointment.userId == req.session.id) {
+                return {
+                  id: appointment.id,
+                  duration: appointment.duration,
+                  date: formatDate(appointment.date),
+                  time: appointment.date.toLocaleTimeString([], {
+                    hour12: false,
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  }),
+                  // url: appointment.url,
+                  medic,
+                  service,
+                  status: appointment.userId ? "RESERVED" : "OPEN",
+                };
+              } else if (
+                userSubscription &&
+                userSubscription.active &&
+                userSubscription.count > 0
+              )
+                return {
+                  id: appointment.id,
+                  duration: appointment.duration,
+                  date: formatDate(appointment.date),
+                  time: appointment.date.toLocaleTimeString([], {
+                    hour12: false,
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  }),
+                  // url: appointment.url,
+                  medic,
+                  service,
+                  status: appointment.userId ? "RESERVED" : "OPEN",
+                };
+              else return null;
+            }
+          })
+          .filter((item) => item)
       );
 
       res.status(200).send(appointments);

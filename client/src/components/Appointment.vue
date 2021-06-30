@@ -468,14 +468,19 @@
     <div class="q-mt-md row justify-around" v-else>
       <q-badge class="q-pa-sm" color="blue">
         Appointments available to reserve </q-badge
-      ><q-badge class="q-pa-sm" color="grey">
-        Other patients already reserved appointments </q-badge
       ><q-badge class="q-pa-sm" color="green">
         My reserved appointments
       </q-badge>
     </div>
   </div>
 </template>
+
+<style scoped>
+.q-btn,
+.q-select {
+  background: #fff;
+}
+</style>
 
 <script>
 import { openURL } from "quasar";
@@ -584,11 +589,10 @@ export default {
       this.$store.dispatch("data/loadAppointments");
       this.$store.dispatch("data/loadMedicServices");
       this.$store.dispatch("data/loadServices");
-      if (user.type == "medic") {
+      user.type == "medic" &&
         this.$store.dispatch("data/loadMedicAppointments");
-      } else {
+      user.type == "patient" &&
         this.$store.dispatch("data/loadPatientAppointments");
-      }
     }
   },
   methods: {
@@ -948,7 +952,9 @@ export default {
       return this.$store.getters["data/getPatientAppointments"];
     },
     selectedPatientInfo() {
-      const x = this.medicEvents.find(item => item.id == this.selectedEvent.id);
+      const x = this.medicEvents.find(
+        item => this.selectedEvent && item.id == this.selectedEvent.id
+      );
       this.selectedObservation = x.observation;
       return x ? x.patient : {};
     },
@@ -998,7 +1004,7 @@ export default {
           const isHis =
             this.$q.localStorage.getItem("user").type == "medic"
               ? !!this.medicEvents.find(e => e.id == item.id)
-              : !!this.patientEvents.find(e => e.id == item.id);
+              : !!this.patientEvents.find(e => item && e.id == item.id);
           if (item) {
             if (item.status != "OPEN" && !isHis) bgcolor = "#696969";
             //grey
@@ -1010,9 +1016,11 @@ export default {
           }
           return {
             ...item,
-            title: `${item.service.name} - ${item.medic.firstName} ${
-              item.medic.lastName
-            }`,
+            title: item
+              ? `${item.service.name} - ${item.medic.firstName} ${
+                  item.medic.lastName
+                }`
+              : "",
             bgcolor
           };
         });

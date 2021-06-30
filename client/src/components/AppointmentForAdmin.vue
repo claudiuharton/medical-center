@@ -235,7 +235,7 @@ export default {
           label: "Patient",
           align: "left",
           field: row => row.patient,
-          format: val => `${val.firstName} ${val.lastName}`,
+          format: val => (val ? `${val.firstName} ${val.lastName}` : "N/A"),
           sortable: true
         },
         {

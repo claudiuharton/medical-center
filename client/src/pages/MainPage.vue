@@ -2,46 +2,70 @@
   <q-page class>
     <navbar />
     <q-tabs
-      v-if="isMedic"
       v-model="tab"
       dense
       align="justify"
       class="bg-grey-2 text-primary shadow-2"
       :breakpoint="0"
     >
-      <q-tab name="services" label="Services" />
+      <q-tab name="services" v-if="isAdmin || isMedic" label="Services" />
       <q-tab name="appointments" label="Appointments" />
+      <q-tab
+        name="subscriptions"
+        label="Subscriptions"
+        v-if="isAdmin || !isMedic"
+      />
     </q-tabs>
-    <q-tab-panels v-if="isMedic" v-model="tab" animated>
-      <q-tab-panel name="services">
+    <q-tab-panels v-model="tab" animated>
+      <q-tab-panel name="services" v-if="isAdmin || isMedic">
         <service />
       </q-tab-panel>
       <q-tab-panel name="appointments">
-        <appointment />
+        <appointment-for-admin v-if="isAdmin" />
+        <appointment v-else />
+      </q-tab-panel>
+      <q-tab-panel name="subscriptions" v-if="isAdmin || !isMedic">
+        <subscriptions-for-admin v-if="isAdmin" />
+        <subscriptions v-else />
       </q-tab-panel>
     </q-tab-panels>
-    <admin v-if="isAdmin" />
-
-    <appointment v-if="!isMedic && !isAdmin" />
   </q-page>
 </template>
 
-<style></style>
+<style>
+.q-tab-panels {
+  background: none;
+}
+</style>
 
 <script>
-import Admin from "../components/Admin.vue";
+import AppointmentForAdmin from "../components/AppointmentForAdmin.vue";
 import Appointment from "../components/Appointment.vue";
 import Navbar from "../components/Navbar.vue";
 import Service from "../components/Service.vue";
+import SubscriptionsForAdmin from "../components/SubscriptionsForAdmin.vue";
+import Subscriptions from "../components/Subscriptions.vue";
 export default {
-  components: { Service, Navbar, Appointment, Admin },
+  components: {
+    SubscriptionsForAdmin,
+    Service,
+    Navbar,
+    Appointment,
+    AppointmentForAdmin,
+    Subscriptions
+  },
   name: "MainPage",
   data() {
     return {
       tab: "appointments"
     };
   },
-
+  beforeMount() {
+    const user = this.$q.localStorage.getItem("user");
+    if (user.type == "admin") {
+      this.tab = "services";
+    }
+  },
   methods: {},
   computed: {
     isMedic() {

@@ -1,6 +1,7 @@
 module.exports = function (sequelize, DataTypes) {
   return sequelize.define("subscription", {
     type: DataTypes.STRING,
-    price: DataTypes.FLOAT,
+    pricePercent: DataTypes.FLOAT,
+    count: DataTypes.INTEGER,
   });
 };

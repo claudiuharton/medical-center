@@ -3,5 +3,6 @@ module.exports = function (sequelize, DataTypes) {
     amountToBePaid: DataTypes.FLOAT,
     dueDate: DataTypes.DATE,
     active: DataTypes.BOOLEAN,
+    count: DataTypes.INTEGER,
   });
 };

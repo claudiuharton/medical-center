@@ -1,6 +1,12 @@
 const express = require("express");
 const router = express.Router();
-const { auth, reset, service, appointment } = require("../controllers");
+const {
+  auth,
+  reset,
+  service,
+  appointment,
+  subscription,
+} = require("../controllers");
 
 //reset
 router.get("/reset", reset.reset);
@@ -13,8 +19,8 @@ router.put("/user", auth.middleware.checkLogin, auth.editUser);
 router.delete("/user", auth.middleware.checkLogin, auth.deleteAccount);
 
 //service
-router.post("/services", auth.middleware.checkMedic, service.addService);
-router.get("/services", auth.middleware.checkLogin, service.getServices);
+router.post("/services", auth.middleware.checkAdmin, service.addService);
+router.get("/services", service.getServices);
 router.put(
   "/services/medic",
   auth.middleware.checkMedic,
@@ -25,7 +31,7 @@ router.get(
   auth.middleware.checkLogin,
   service.getMedicServices
 );
-router.put("/services/:id", auth.middleware.checkMedic, service.editService);
+router.put("/services/:id", auth.middleware.checkAdmin, service.editService);
 router.delete(
   "/services/:id",
   auth.middleware.checkMedic,
@@ -73,4 +79,44 @@ router.put(
   appointment.updateAppointment
 );
 
+//subscription
+
+router.get("/subscriptions", subscription.getSubscriptions);
+
+router.get("/payments", auth.middleware.checkLogin, subscription.getPayments);
+
+router.post(
+  "/subscriptions",
+  auth.middleware.checkAdmin,
+  subscription.addSubscription
+);
+
+router.post(
+  "/payments",
+  auth.middleware.checkLogin,
+  subscription.executePayment
+);
+
+router.post(
+  "/subscriptions/user",
+  auth.middleware.checkLogin,
+  subscription.makeSubscription
+);
+
+router.get(
+  "/subscriptions/user",
+  auth.middleware.checkLogin,
+  subscription.getHisSubscriptions
+);
+
+router.put(
+  "/subscriptions/:id",
+  auth.middleware.checkAdmin,
+  subscription.editSubscription
+);
+router.delete(
+  "/subscriptions/:id",
+  auth.middleware.checkAdmin,
+  subscription.deleteSubscription
+);
 module.exports = router;

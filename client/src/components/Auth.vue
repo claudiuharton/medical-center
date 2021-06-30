@@ -1,5 +1,7 @@
 <template>
   <q-card class="container login" v-if="!isRegister">
+    <q-img :ratio="16 / 9" src="./../assets/img.png" />
+
     <q-card-section class="row items-center">
       <div class="text-h6">Login</div>
     </q-card-section>

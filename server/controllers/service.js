@@ -3,9 +3,9 @@ const { Service, MedicService, User } = require("../models");
 const controller = {
   addService: async (req, res) => {
     try {
-      const { name, description, category } = req.body;
+      const { name, description, category, price } = req.body;
 
-      await Service.create({ name, description, category });
+      await Service.create({ name, description, category, price });
 
       res.status(201).send({
         message: `Service ${name} was created`,
@@ -31,7 +31,7 @@ const controller = {
   },
   editService: async (req, res) => {
     try {
-      const { name, description, category } = req.body;
+      const { name, description, category, price } = req.body;
       const { id } = req.params;
 
       const service = await Service.findOne({ where: { id } });
@@ -41,7 +41,13 @@ const controller = {
           message: `Service not found`,
         });
       } else {
-        await service.update({ ...service, name, description, category });
+        await service.update({
+          ...service,
+          name,
+          description,
+          category,
+          price,
+        });
         res.status(200).send({
           message: `Service ${name} updated`,
         });

@@ -4,5 +4,8 @@ export default {
   appointments: [],
   appointmentsAsAdmin: [],
   medicAppointments: [],
-  patientAppointments: []
+  patientAppointments: [],
+  subscriptions: [],
+  patientSubscriptions: [],
+  payments: []
 };

@@ -11,6 +11,15 @@ export function getAppointments(state) {
 export function getMedicAppointments(state) {
   return state.medicAppointments;
 }
+export function getSubscriptions(state) {
+  return state.subscriptions;
+}
+export function getPatientSubscriptions(state) {
+  return state.patientSubscriptions;
+}
+export function getPayments(state) {
+  return state.payments;
+}
 
 export function getPatientAppointments(state) {
   return state.patientAppointments;

@@ -75,7 +75,7 @@ module.exports = function(ctx) {
     devServer: {
       // https: true,
       port: 8080,
-      // before: require("../server/server.js"),
+      before: require("../server/server.js"),
       open: true // opens browser window automatically
     },
 

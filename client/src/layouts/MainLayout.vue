@@ -2,7 +2,7 @@
   <q-layout view="lHh Lpr lFf">
     <q-header elevated>
       <q-toolbar>
-        <q-toolbar-title>Medical clinic</q-toolbar-title>
+        <q-toolbar-title>Medical center</q-toolbar-title>
       </q-toolbar>
     </q-header>
     <q-page-container>

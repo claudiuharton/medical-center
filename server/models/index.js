@@ -12,6 +12,10 @@ User.hasMany(MedicService, { onDelete: "Cascade" });
 Service.hasMany(MedicService, { onDelete: "Cascade" });
 MedicService.hasMany(Appointment, { onDelete: "Cascade" });
 User.hasMany(Appointment, { onDelete: "Cascade" });
+UserSubscription.hasMany(Payment, { onDelete: "Cascade" });
+User.hasMany(UserSubscription, { onDelete: "Cascade" });
+Subscription.hasMany(UserSubscription, { onDelete: "Cascade" });
+Service.hasMany(UserSubscription, { onDelete: "Cascade" });
 
 module.exports = {
   UserSubscription,

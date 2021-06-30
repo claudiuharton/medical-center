@@ -3,5 +3,6 @@ module.exports = function (sequelize, DataTypes) {
     name: DataTypes.STRING,
     category: DataTypes.STRING,
     description: DataTypes.STRING,
+    price: DataTypes.FLOAT,
   });
 };
