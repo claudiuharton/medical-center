@@ -34,7 +34,7 @@ router.get(
 router.put("/services/:id", auth.middleware.checkAdmin, service.editService);
 router.delete(
   "/services/:id",
-  auth.middleware.checkMedic,
+  auth.middleware.checkAdmin,
   service.deleteService
 );
 
