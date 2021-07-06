@@ -212,6 +212,15 @@ export default {
           sortable: true
         },
         {
+          name: "price",
+          required: true,
+          label: "Price",
+          align: "left",
+          field: row => row.price,
+          format: val => `${val}`,
+          sortable: true
+        },
+        {
           name: "offer",
           required: true,
           label: "Offering this service?",
