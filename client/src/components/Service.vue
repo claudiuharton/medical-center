@@ -112,6 +112,18 @@
               label="Category"
             />
           </div>
+          <div class="row q-mb-md">
+            <div class="col-3 text-grey">Price:</div>
+
+            <q-input
+              class="col-9"
+              type="number"
+              outlined
+              v-model="selectedService.price"
+              dense
+              label="Price"
+            />
+          </div>
         </q-card-section>
         <q-card-section>
           <q-card-actions align="around">

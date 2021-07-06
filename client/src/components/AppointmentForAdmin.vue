@@ -217,7 +217,13 @@ export default {
           label: "Date Time",
           align: "left",
           field: row => row.date,
-          format: val => `${val}`,
+          format: val => {
+            if (!val) {
+              return "N/A";
+            }
+            const d = new Date(val);
+            return `${d.toLocaleString()}`;
+          },
           sortable: true
         },
         {
