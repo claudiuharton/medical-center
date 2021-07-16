@@ -119,7 +119,7 @@
             <p class="text-h5  row justify-center">
               Price: {{ selectedSubscription.service.price }}
 
-              RON
+              EUR
             </p>
           </div>
           <div class="row justify-around">
@@ -135,7 +135,7 @@
                     selectedSubscription.subscription.value *
                     (selectedSubscription.subscription.pricePercent / 100)
               }}
-              RON
+              EUR
             </p>
           </div>
 
@@ -152,7 +152,7 @@
                 selectedSubscription.subscription.value *
                 (selectedSubscription.subscription.pricePercent / 100)
             }}
-            RON
+            EUR
           </p>
           <p></p
         ></q-card-section>
@@ -177,10 +177,10 @@
                   selectedSubscription.subscription.count *
                   (selectedSubscription.subscription.pricePercent / 100)
               }}
-              RON
+              EUR
             </div>
             <div class="col-3 text-grey">
-              Amount to be paid: {{ selectedSubscription.amountToBePaid }} RON
+              Amount to be paid: {{ selectedSubscription.amountToBePaid }} EUR
             </div>
             <div class="col-3 text-grey">
               Due date:
@@ -202,7 +202,7 @@
               Description: {{ selectedSubscription.service.description }}
             </div>
             <div class="col-3 text-grey">
-              Default price: {{ selectedSubscription.service.price }} RON
+              Default price: {{ selectedSubscription.service.price }} EUR
             </div>
           </div>
         </q-card-section>
@@ -213,7 +213,7 @@
             v-for="payment in payments"
             :key="payment.id"
           >
-            <div>Amount: {{ payment.amount }} RON</div>
+            <div>Amount: {{ payment.amount }} EUR</div>
             <div style="margin-left:50px">
               Date:
               {{ payment.createdAt && payment.createdAt.substring(0, 10) }}
@@ -381,7 +381,7 @@ export default {
           label: "Amount to be paid",
           align: "left",
           field: row => row.amountToBePaid,
-          format: val => `${val} RON`,
+          format: val => `${val} EUR`,
           sortable: true
         },
         {

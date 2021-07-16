@@ -217,7 +217,7 @@ export default {
           label: "Price",
           align: "left",
           field: row => row.price,
-          format: val => `${val}`,
+          format: val => `${val} EUR`,
           sortable: true
         },
         {
